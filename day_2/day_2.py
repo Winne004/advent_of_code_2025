@@ -17,6 +17,20 @@ def is_repeated_twice(id_: int) -> bool:
     return l == r
 
 
+def is_repeated(id_: int) -> bool:
+    str_id = str(id_)
+
+    test = [
+        str_id[:chunk]
+        for x in range(1, len(str(id_)))
+        for chunk in range(x, len(str(id_)) // 2 + 1, x)
+    ]
+
+    test = [t * (len(str_id) // len(t)) for t in test]
+
+    return str_id in test
+
+
 def day_2() -> None:
     res = 0
     input_path = Path() / "day_2" / "input.txt"
@@ -25,9 +39,10 @@ def day_2() -> None:
     ids = line.strip().split(",")
     for id_ in ids:
         for number in yeild_numbers(id_):
-            if is_repeated_twice(number):
+            if is_repeated(number):
                 print(f"Found repeated twice number: {number}")
                 res += number
+
     print(f"Result: {res}")
 
 
