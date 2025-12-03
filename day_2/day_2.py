@@ -19,16 +19,15 @@ def is_repeated_twice(id_: int) -> bool:
 
 def is_repeated(id_: int) -> bool:
     str_id = str(id_)
+    n = len(str_id)
 
-    test = [
-        str_id[:chunk]
-        for x in range(1, len(str(id_)))
-        for chunk in range(x, len(str(id_)) // 2 + 1, x)
-    ]
+    for pattern_len in range(1, n // 2 + 1):
+        if n % pattern_len == 0:
+            pattern = str_id[:pattern_len]
+            if pattern * (n // pattern_len) == str_id:
+                return True
 
-    test = [t * (len(str_id) // len(t)) for t in test]
-
-    return str_id in test
+    return False
 
 
 def day_2() -> None:
