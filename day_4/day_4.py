@@ -51,9 +51,13 @@ def day_4_pt_1() -> None:
     print(lines)
     grid = Grid(lines)
     res = 0
-    for r, c in grid.iterate_grid():
-        if lines[r][c] == "@" and grid.check_adjacent(r, c) < 4:
-            res += 1
+    previous_val = -1
+    while previous_val != res:
+        previous_val = res
+        for r, c in grid.iterate_grid():
+            if lines[r][c] == "@" and grid.check_adjacent(r, c) < 4:
+                res += 1
+                lines[r][c] = "."
 
     print(f"Pt 1 Result: {res}")
 
