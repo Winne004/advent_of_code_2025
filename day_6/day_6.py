@@ -1,7 +1,9 @@
 import math
 import sys
 from enum import StrEnum
+from itertools import groupby
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from utils.file_helpers import FileHandler, Parser
@@ -42,7 +44,7 @@ def day_6_pt_1() -> None:
     res = 0
     for problem_line in input:
         res += perform_math_operation(list(problem_line))
-    print(res)
+    print(f"Pt. 1 Result: {res}")
 
 
 def day_6_pt_2() -> None:
@@ -55,25 +57,21 @@ def day_6_pt_2() -> None:
         for col in columns
         if col[-1] == Operators.ADD or col[-1] == Operators.MULTIPLY
     ]
-    parser_input = []
-    tmp = []
-    for col in numbers:
-        col = "".join(col).strip()
-        if not col:
-            parser_input.append(tmp)
-            tmp = []
-        else:
-            tmp.append(col)
-    parser_input.append(tmp)
-    print(parser_input)
-    print(operators)
+    parser_input = [
+        [number for number in group if number]
+        for key, group in groupby(
+            ("".join(col).strip() for col in numbers),
+            key=bool,
+        )
+        if key
+    ]
     resulitng = zip(parser_input, operators, strict=True)
     for problem_line, operator in resulitng:
         res += perform_math_operation([*problem_line, operator])
-    print(res)
+    print(f"Pt. 2 Result: {res}")
 
 
-def get_input(parser: Parser):
+def get_input(parser: Parser) -> list[Any]:
     input_path = Path() / "day_6" / "input.txt"
     file = FileHandler(input_path, parser=parser).read_lines()
     return list(file)
