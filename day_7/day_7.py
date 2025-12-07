@@ -1,4 +1,5 @@
 import sys
+from functools import cache
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +22,7 @@ class Grid:
         self.data = data
         self.seen = set()
         self.splits = 0
+        self.timelines = 0
 
     def in_bounds(self, row: int, col: int) -> bool:
         return 0 <= row < len(self.data) and 0 <= col < len(self.data[0])
@@ -32,24 +34,52 @@ class Grid:
                     return (r, c)
         raise ValueError("Start position not found")
 
-    def recurse(self, row: int, col: int) -> int:
-        if not self.in_bounds(row, col):
-            return 0
-        if (row, col) in self.seen:
-            return 0
-        self.seen.add((row, col))
-        if self.data[row][col] == Constants.SPLITTER:
-            self.splits += 1
-            return self.recurse(row, col - 1) + self.recurse(row, col + 1)
-        return self.recurse(row + 1, col) + 1
+    def recurse_pt1(self) -> None:
+        def helper(row: int, col: int) -> int:
+            if not self.in_bounds(row, col):
+                return 0
+            if (row, col) in self.seen:
+                return 0
+            self.seen.add((row, col))
+            if self.data[row][col] == Constants.SPLITTER:
+                self.splits += 1
+                return helper(row, col - 1) + helper(row, col + 1)
+            return helper(row + 1, col)
+
+        self.reset()
+        start, finish = self.find_start()
+        self.timelines = helper(start, finish)
+
+    def recurse_pt_2(self) -> None:
+        @cache
+        def helper(row: int, col: int) -> int:
+            if not self.in_bounds(row, col):
+                return 0
+            if row == len(self.data) - 1 and self.data[row][col] != Constants.SPLITTER:
+                return 1
+            self.seen.add((row, col))
+            if self.data[row][col] == Constants.SPLITTER:
+                return helper(row, col - 1) + helper(row, col + 1)
+            return helper(row + 1, col)
+
+        self.reset()
+        start, finish = self.find_start()
+        self.timelines = helper(start, finish)
+
+    def reset(self) -> None:
+        self.seen = set()
+        self.splits = 0
 
 
 def day_7_pt_1() -> None:
     input = get_input(LineParser())
     grid = Grid(input)
-    start_row, start_col = grid.find_start()
-    grid.recurse(start_row, start_col)
+
+    grid.recurse_pt1()
     print(f"The tachyon beam is split a total of: {grid.splits} times")
+
+    grid.recurse_pt_2()
+    print(f"Total time-lines detected: {grid.timelines}")
 
 
 def get_input(parser: Parser) -> list[Any]:
