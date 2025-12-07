@@ -69,6 +69,7 @@ class Grid:
     def reset(self) -> None:
         self.seen = set()
         self.splits = 0
+        self.timelines = 0
 
 
 def day_7_pt_1() -> None:
