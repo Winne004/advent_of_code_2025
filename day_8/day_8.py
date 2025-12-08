@@ -29,7 +29,7 @@ class Circuits:
         self.circuits[junction_1].append(junction_2)
         self.circuits[junction_2].append(junction_1)
 
-    def dfs(self):
+    def dfs(self) -> list[Any]:
         def helper(start: Coords, visited: set[Coords]) -> int:
             visited.add(start)
             count = 1
@@ -39,11 +39,13 @@ class Circuits:
             return count
 
         visited = set()
+        counts = []
         for circuit in self.circuits:
             if circuit in visited:
                 continue
             count = helper(circuit, visited)
-            print(f"Circuit starting at {circuit} visits: {count} junctions")
+            counts.append(count)
+        return counts
 
 
 class LineParser(Parser):
@@ -52,11 +54,7 @@ class LineParser(Parser):
         return Coords(int(x), int(y), int(z))
 
 
-def day_8_pt_1() -> None:
-    input: list[Coords] = get_input(LineParser())
-    print(f"Pt. 1 Result: {input}")
-    dist = math.dist(input[0], input[1])
-    print(f"Distance between points: {dist}")
+def calc_distances(input: list[Coords]) -> list[Any]:
     distances = []
     seen = set()
     for p1, p2 in product(input, repeat=2):
@@ -66,22 +64,28 @@ def day_8_pt_1() -> None:
         dist = math.dist(p1, p2)
         if p1 != p2:
             distances.append((dist, (p1, p2)))
+    return distances
+
+
+def day_8_pt_1() -> None:
+    input: list[Coords] = get_input(LineParser())
+
+    distances = calc_distances(input)
 
     circuits = Circuits()
 
     distances.sort(key=lambda x: x[0], reverse=True)
-    for x in range(10):
+    for _ in range(1000):
         closest_points = distances.pop()
-        print(
-            f" {x} Closest points are {closest_points[1]} with a distance of {closest_points[0]}",
-        )
         circuits.add_connection(
             junction_1=closest_points[1][0],
             junction_2=closest_points[1][1],
         )
-    print(f"Circuits: {circuits.circuits}")
-    print("DFS Traversal of Circuits:")
-    circuits.dfs()
+    counts = circuits.dfs()
+    print(
+        f"Counts of junctions visited in each circuit: {sorted(counts, reverse=True)[:3]}",
+    )
+    print(f"Pt. 2 Result: {math.prod(sorted(counts, reverse=True)[:3])}")
 
 
 def get_input(parser: Parser) -> list[Any]:
