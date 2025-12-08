@@ -4,6 +4,7 @@ from collections import defaultdict
 from collections.abc import Iterator
 from dataclasses import dataclass
 from itertools import product
+from operator import attrgetter
 from pathlib import Path
 from typing import Any
 
@@ -19,6 +20,13 @@ class Coords:
 
     def __iter__(self) -> Iterator[int]:
         return iter((self.x, self.y, self.z))
+
+
+@dataclass(frozen=True)
+class Distance:
+    distance: float
+    point_1: Coords
+    point_2: Coords
 
 
 class Circuits:
@@ -54,7 +62,7 @@ class LineParser(Parser):
         return Coords(int(x), int(y), int(z))
 
 
-def calc_distances(input: list[Coords]) -> list[Any]:
+def calc_distances(input: list[Coords]) -> list[Distance]:
     distances = []
     seen = set()
     for p1, p2 in product(input, repeat=2):
@@ -63,7 +71,7 @@ def calc_distances(input: list[Coords]) -> list[Any]:
         seen.add((p1, p2))
         dist = math.dist(p1, p2)
         if p1 != p2:
-            distances.append((dist, (p1, p2)))
+            distances.append(Distance(dist, p1, p2))
     return distances
 
 
@@ -74,12 +82,12 @@ def day_8_pt_1() -> None:
 
     circuits = Circuits()
 
-    distances.sort(key=lambda x: x[0], reverse=True)
+    distances.sort(key=attrgetter("distance"), reverse=True)
     for _ in range(1000):
         closest_points = distances.pop()
         circuits.add_connection(
-            junction_1=closest_points[1][0],
-            junction_2=closest_points[1][1],
+            junction_1=closest_points.point_1,
+            junction_2=closest_points.point_2,
         )
     counts = circuits.dfs()
     print(
