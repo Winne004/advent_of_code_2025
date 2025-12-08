@@ -3,7 +3,7 @@ import sys
 from collections import defaultdict
 from collections.abc import Iterator
 from dataclasses import dataclass
-from itertools import product
+from itertools import combinations
 from operator import attrgetter
 from pathlib import Path
 from typing import Any
@@ -64,11 +64,7 @@ class LineParser(Parser):
 
 def calc_distances(input: list[Coords]) -> list[Distance]:
     distances = []
-    seen = set()
-    for p1, p2 in product(input, repeat=2):
-        if (p1, p2) in seen or (p2, p1) in seen:
-            continue
-        seen.add((p1, p2))
+    for p1, p2 in combinations(input, 2):
         dist = math.dist(p1, p2)
         if p1 != p2:
             distances.append(Distance(dist, p1, p2))
