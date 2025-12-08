@@ -79,7 +79,6 @@ def day_8_pt_1() -> None:
     input: list[Coords] = get_input(LineParser())
 
     distances = calc_distances(input)
-
     circuits = Circuits()
 
     distances.sort(key=attrgetter("distance"), reverse=True)
@@ -93,7 +92,16 @@ def day_8_pt_1() -> None:
     print(
         f"Counts of junctions visited in each circuit: {sorted(counts, reverse=True)[:3]}",
     )
-    print(f"Pt. 2 Result: {math.prod(sorted(counts, reverse=True)[:3])}")
+    print(f"Pt. 1 Result: {math.prod(sorted(counts, reverse=True)[:3])}")
+
+    while not all(coord in circuits.circuits for coord in input):
+        closest_points = distances.pop()
+        circuits.add_connection(
+            junction_1=closest_points.point_1,
+            junction_2=closest_points.point_2,
+        )
+
+    print(f"Part 2 Result: {closest_points.point_1.x * closest_points.point_2.x}")
 
 
 def get_input(parser: Parser) -> list[Any]:
