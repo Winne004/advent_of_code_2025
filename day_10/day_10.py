@@ -87,7 +87,7 @@ def day_10_pt_1() -> None:
     indicator_lights: list[IndicatorLight] = get_input(LineParser())
     print("Indicator Lights:", indicator_lights)
     res = 0
-    for idx, indicator_light in enumerate(indicator_lights):
+    for indicator_light in indicator_lights:
         res += bfs_toggle_lights(
             [Constants.LIGHT_OFF.value] * len(indicator_light.diagram),
             indicator_light,
